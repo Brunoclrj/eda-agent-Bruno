@@ -1,0 +1,240 @@
+{
+  "name": "Slack AI Chat - Channel History Q&A",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "When chat message received",
+      "type": "n8n-nodes-base.chatTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "slack-ai-chat"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "getAll",
+        "channelId": {
+          "__rl": true,
+          "value": "",
+          "mode": "list",
+          "cachedResultName": ""
+        },
+        "returnAll": false,
+        "limit": 200,
+        "filters": {
+          "oldest": "={{ $today.minus({ days: 7 }).toUnixInteger() }}"
+        }
+      },
+      "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+      "name": "Slack - Get Channel History",
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.1,
+      "position": [470, 300],
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "1",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process Slack messages into a readable format for AI\nconst messages = $input.all();\n\n// Format messages with timestamp, user, and text\nconst formattedMessages = messages.map(msg => {\n  const item = msg.json;\n  const timestamp = new Date(parseFloat(item.ts) * 1000).toLocaleString('pt-BR');\n  const user = item.user || item.username || 'Unknown';\n  const text = item.text || '';\n  \n  // Handle thread replies\n  const threadInfo = item.thread_ts ? ` [Thread Reply]` : '';\n  \n  return `[${timestamp}] ${user}${threadInfo}: ${text}`;\n});\n\n// Join all messages into a single context\nconst context = formattedMessages.join('\\n\\n');\n\n// Get the user's question from the chat trigger\nconst userQuestion = $('When chat message received').item.json.chatInput;\n\nreturn {\n  context: context,\n  question: userQuestion,\n  messageCount: messages.length,\n  channelId: messages[0]?.json.channel || 'unknown'\n};"
+      },
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "name": "Process Messages",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [690, 300]
+    },
+    {
+      "parameters": {
+        "operation": "message",
+        "model": "gpt-4-turbo-preview",
+        "messages": {
+          "messageValues": [
+            {
+              "role": "system",
+              "message": "=Você é um assistente especializado em analisar históricos de conversas do Slack. Você tem acesso ao histórico de mensagens de um canal específico e deve responder perguntas APENAS baseado no conteúdo real dessas mensagens.\n\nREGRAS IMPORTANTES:\n1. Responda APENAS com base nas mensagens fornecidas no contexto\n2. Se a informação não estiver nas mensagens, diga claramente \"Não encontrei essa informação nas mensagens do canal\"\n3. Cite mensagens específicas quando relevante (mencione o usuário e horário)\n4. Seja objetivo e direto nas respostas\n5. Para resumos, organize em bullet points\n6. Identifique action items, decisões, blockers e questões quando solicitado\n\nCONTEXTO - HISTÓRICO DO CANAL ({{ $json.messageCount }} mensagens dos últimos 7 dias):\n\n{{ $json.context }}"
+            },
+            {
+              "role": "user",
+              "message": "={{ $json.question }}"
+            }
+          ]
+        },
+        "options": {
+          "temperature": 0.3,
+          "maxTokens": 2000
+        }
+      },
+      "id": "d4e5f6a7-b8c9-0123-def1-234567890123",
+      "name": "OpenAI Chat",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 1.3,
+      "position": [910, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "1",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format the AI response for the chat\nconst aiResponse = $input.first().json.message.content;\nconst messageCount = $('Process Messages').first().json.messageCount;\nconst channelId = $('Process Messages').first().json.channelId;\n\nreturn {\n  chatResponse: aiResponse,\n  metadata: {\n    messagesAnalyzed: messageCount,\n    channelId: channelId,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "id": "e5f6a7b8-c9d0-1234-ef12-345678901234",
+      "name": "Format Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1130, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "={{ $json.chatResponse }}\n\n---\n_Analisadas {{ $json.metadata.messagesAnalyzed }} mensagens do canal_"
+      },
+      "id": "f6a7b8c9-d0e1-2345-f123-456789012345",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1350, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.context }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            }
+          ]
+        }
+      },
+      "id": "g7h8i9j0-e1f2-3456-a123-567890123456",
+      "name": "Check Messages Exist",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [690, 500]
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "Não encontrei mensagens no canal especificado. Verifique se:\n1. O canal ID está correto\n2. O bot tem permissões para ler o histórico\n3. Existem mensagens nos últimos 7 dias"
+      },
+      "id": "h8i9j0k1-f2a3-4567-b123-678901234567",
+      "name": "Send Error Message",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [910, 500]
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Slack - Get Channel History",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Slack - Get Channel History": {
+      "main": [
+        [
+          {
+            "node": "Process Messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Messages": {
+      "main": [
+        [
+          {
+            "node": "Check Messages Exist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Messages Exist": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Chat",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Error Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat": {
+      "main": [
+        [
+          {
+            "node": "Format Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Response": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "createdAt": "2025-01-10T00:00:00.000Z",
+      "updatedAt": "2025-01-10T00:00:00.000Z",
+      "id": "1",
+      "name": "AI"
+    },
+    {
+      "createdAt": "2025-01-10T00:00:00.000Z",
+      "updatedAt": "2025-01-10T00:00:00.000Z",
+      "id": "2",
+      "name": "Slack"
+    }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-10T00:00:00.000Z",
+  "versionId": "1"
+}

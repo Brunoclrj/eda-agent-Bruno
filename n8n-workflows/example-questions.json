@@ -1,0 +1,114 @@
+{
+  "example_questions": {
+    "resumos": [
+      "Faça um resumo das últimas 24 horas em 5 pontos",
+      "Resuma as discussões da última sprint planning",
+      "O que aconteceu na reunião de ontem?",
+      "Dê um overview das conversas desta semana",
+      "Qual foi o tópico mais discutido hoje?"
+    ],
+    "action_items": [
+      "Quais action items foram atribuídos e para quem?",
+      "Liste todas as tarefas mencionadas esta semana",
+      "Quem ficou responsável por cada tarefa?",
+      "Quais são os próximos passos definidos?",
+      "Mostre os TODOs que ainda não foram completados"
+    ],
+    "blockers": [
+      "Mostre mensagens com a palavra 'blocker' dos últimos 2 dias",
+      "Quem está bloqueado e por quê?",
+      "Quais problemas foram reportados hoje?",
+      "Liste todos os impedimentos mencionados",
+      "Que bloqueios foram resolvidos?"
+    ],
+    "questoes": [
+      "Liste perguntas que ainda não foram respondidas",
+      "Quais dúvidas foram levantadas sobre o projeto X?",
+      "Que questões técnicas surgiram?",
+      "Há alguma pergunta sem resposta?",
+      "Quais discussões ainda estão em aberto?"
+    ],
+    "participacao": [
+      "Quem foi mencionado mais vezes esta semana?",
+      "Quem mais participou das discussões?",
+      "Liste todos os usuários que comentaram sobre [tema]",
+      "Qual membro do time foi mais ativo?",
+      "Quantas pessoas participaram da discussão sobre [tópico]?"
+    ],
+    "decisoes": [
+      "Quais decisões foram tomadas sobre arquitetura?",
+      "Resuma as conclusões da última reunião",
+      "O que foi decidido sobre o prazo do projeto?",
+      "Liste todas as decisões finais",
+      "Que acordos foram fechados esta semana?"
+    ],
+    "arquivos_links": [
+      "Que arquivos foram compartilhados hoje?",
+      "Liste todos os links enviados esta semana",
+      "Quais documentos foram mencionados?",
+      "Mostre URLs compartilhadas sobre [tema]",
+      "Que recursos foram indicados?"
+    ],
+    "busca_especifica": [
+      "Encontre mensagens que mencionam 'deploy'",
+      "Quem falou sobre 'bug' esta semana?",
+      "Mostre discussões sobre 'performance'",
+      "Liste conversas que citam 'deadline'",
+      "Quando foi mencionado '[palavra-chave]'?"
+    ],
+    "timeline": [
+      "O que aconteceu ontem entre 14h e 18h?",
+      "Mostre a cronologia das discussões sobre [tema]",
+      "Como evoluiu a conversa sobre [tópico]?",
+      "Qual foi a sequência de eventos hoje?",
+      "Mostre as mensagens em ordem cronológica sobre [assunto]"
+    ],
+    "metricas": [
+      "Quantas mensagens foram enviadas hoje?",
+      "Qual foi o horário de pico de atividade?",
+      "Quantas pessoas participaram das discussões?",
+      "Qual a média de mensagens por dia?",
+      "Houve algum dia com atividade incomum?"
+    ]
+  },
+  "advanced_queries": {
+    "analise_sentimento": [
+      "Qual foi o tom geral das conversas? Positivo ou negativo?",
+      "Houve algum conflito ou desacordo?",
+      "Identifique mensagens que expressam frustração",
+      "Como está o moral do time baseado nas conversas?"
+    ],
+    "comparacao": [
+      "Compare a atividade desta semana com a semana passada",
+      "Houve mudanças significativas nos tópicos discutidos?",
+      "Compare a participação dos membros do time",
+      "As discussões ficaram mais técnicas ou mais estratégicas?"
+    ],
+    "insights": [
+      "Quais padrões você identifica nas conversas?",
+      "Que tópicos estão sendo negligenciados?",
+      "Há algum problema recorrente?",
+      "Que oportunidades de melhoria você vê?"
+    ],
+    "relatorios": [
+      "Gere um relatório executivo das últimas 48 horas",
+      "Crie um resumo para quem estava de férias esta semana",
+      "Monte um status report do projeto baseado nas mensagens",
+      "Faça um relatório de progresso semanal"
+    ]
+  },
+  "tips": {
+    "seja_especifico": "Quanto mais específica a pergunta, melhor a resposta. Em vez de 'o que aconteceu?', pergunte 'quais bugs foram reportados hoje?'",
+    "use_contexto": "Mencione períodos de tempo: 'nas últimas 24h', 'ontem', 'esta semana'",
+    "solicite_formato": "Peça o formato desejado: 'liste em bullet points', 'resuma em 3 frases', 'organize por prioridade'",
+    "combine_filtros": "Combine critérios: 'mostre action items atribuídos ao João nos últimos 2 dias'",
+    "iteracao": "Faça perguntas de acompanhamento: 'você mencionou um blocker, pode detalhar?'"
+  },
+  "template_prompts": {
+    "daily_standup": "Analise as mensagens de hoje e organize em: 1) O que foi feito 2) O que será feito 3) Bloqueios",
+    "weekly_review": "Gere um resumo semanal com: principais conquistas, problemas encontrados, próximos passos",
+    "sprint_planning": "Liste todos os itens discutidos para a próxima sprint, com prioridades mencionadas",
+    "incident_report": "Identifique e descreva o incidente mencionado: causa, impacto, resolução, responsáveis",
+    "knowledge_extraction": "Extraia todas as decisões técnicas e justificativas mencionadas"
+  }
+}
