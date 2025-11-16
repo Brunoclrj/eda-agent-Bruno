@@ -1,0 +1,9 @@
+# Dependências para os exemplos do Google ADK
+# Para instalar: pip install -r requirements-adk.txt
+
+# Google ADK e Gemini
+google-adk>=1.18.0
+google-genai>=1.50.0
+
+# Utilitários
+python-dotenv>=1.0.0
